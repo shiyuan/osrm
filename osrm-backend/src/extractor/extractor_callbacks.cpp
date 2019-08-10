@@ -9,6 +9,7 @@
 #include "util/for_each_pair.hpp"
 #include "util/guidance/turn_lanes.hpp"
 #include "util/simple_logger.hpp"
+#include "util/coordinate_converter.hpp"
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/optional/optional.hpp>
@@ -48,9 +49,15 @@ ExtractorCallbacks::ExtractorCallbacks(ExtractionContainers &extraction_containe
 void ExtractorCallbacks::ProcessNode(const osmium::Node &input_node,
                                      const ExtractionNode &result_node)
 {
-    external_memory.all_nodes_list.push_back(
-        {util::toFixed(util::FloatLongitude{input_node.location().lon()}),
-         util::toFixed(util::FloatLatitude{input_node.location().lat()}),
+    util::FloatCoordinate coordinate{util::FloatLongitude{input_node.location().lon()},
+                          util::FloatLatitude{input_node.location().lat()}};
+    util::FloatCoordinate gcj_coordinate;
+    util::coordinate_converter::convert_wgs84_to_gcj02(coordinate, gcj_coordinate);
+    external_memory.all_nodes_list.push_back({
+         util::toFixed(gcj_coordinate.lon),
+         util::toFixed(gcj_coordinate.lat),
+         // util::toFixed(util::FloatLongitude{input_node.location().lon()}),
+         // util::toFixed(util::FloatLatitude{input_node.location().lat()}),
          OSMNodeID{static_cast<std::uint64_t>(input_node.id())},
          result_node.barrier,
          result_node.traffic_lights});

@@ -22,4 +22,4 @@ docker run -i -v ${PWD}:/data ${IMAGE} osrm-contract /data/${CITY}.osrm
 docker run -i -p 5000:5000 -v ${PWD}:/data ${IMAGE} osrm-routed /data/${CITY}.osrm
 
 # test
-# curl "http://127.0.0.1:5000/route/v1/driving/121.3199201313,31.2389434953;121.3774272910,31.2348205216?steps=true" | jq  '.routes[0]| [.duration, .distance]'
+# curl "http://127.0.0.1:5000/route/v1/driving/121.3244462013,31.2370225222;121.3820385933,31.2329448269?steps=true" | jq  '.routes[0]| [.duration, .distance]'

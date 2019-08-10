@@ -82,3 +82,4 @@ RUN export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ && \
 
 FROM builder AS runstage
 COPY --from=builder /usr/local /usr/local
+WORKDIR /opt

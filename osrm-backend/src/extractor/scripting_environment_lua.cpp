@@ -76,6 +76,8 @@ void LuaScriptingEnvironment::InitContext(LuaScriptingContext &context)
     luaL_openlibs(context.state);
 
     util::luaAddScriptFolderToLoadPath(context.state, file_name.c_str());
+    enum TravelModeEnumDummyForLuabind {};
+    enum RoadPriorityClassEnumDummyForLuabind {};
 
     // Add our function to the state's global scope
     luabind::module(context.state)
@@ -83,7 +85,7 @@ void LuaScriptingEnvironment::InitContext(LuaScriptingContext &context)
          luabind::def("parseDuration", parseDuration),
          luabind::def("trimLaneString", trimLaneString),
          luabind::def("applyAccessTokens", applyAccessTokens),
-         luabind::class_<TravelMode>("mode").enum_(
+         luabind::class_<TravelModeEnumDummyForLuabind>("mode").enum_(
              "enums")[luabind::value("inaccessible", TRAVEL_MODE_INACCESSIBLE),
                       luabind::value("driving", TRAVEL_MODE_DRIVING),
                       luabind::value("cycling", TRAVEL_MODE_CYCLING),
@@ -97,7 +99,7 @@ void LuaScriptingEnvironment::InitContext(LuaScriptingContext &context)
                       luabind::value("river_down", TRAVEL_MODE_RIVER_DOWN),
                       luabind::value("route", TRAVEL_MODE_ROUTE)],
 
-         luabind::class_<extractor::guidance::RoadPriorityClass::Enum>("road_priority_class")
+         luabind::class_<RoadPriorityClassEnumDummyForLuabind>("road_priority_class")
              .enum_("enums")
                  [luabind::value("motorway", extractor::guidance::RoadPriorityClass::MOTORWAY),
                   luabind::value("trunk", extractor::guidance::RoadPriorityClass::TRUNK),

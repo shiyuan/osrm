@@ -70,6 +70,7 @@ inline LegGeometry assembleGeometry(const datafacade::BaseDataFacade &facade,
             facade.GetOSMNodeIDOfNode(source_geometry[source_segment_start_coordinate - 1]));
     }
 
+    auto pre_osm_node_id = geometry.osm_node_ids.back();
     auto cumulative_distance = 0.;
     auto current_distance = 0.;
     auto prev_coordinate = geometry.locations.front();
@@ -79,20 +80,28 @@ inline LegGeometry assembleGeometry(const datafacade::BaseDataFacade &facade,
         current_distance =
             util::coordinate_calculation::haversineDistance(prev_coordinate, coordinate);
         cumulative_distance += current_distance;
+        auto cur_osm_node_id = facade.GetOSMNodeIDOfNode(path_point.turn_via_node);
 
         // all changes to this check have to be matched with assemble_steps
         if (path_point.turn_instruction.type != extractor::guidance::TurnType::NoTurn)
         {
             geometry.segment_distances.push_back(cumulative_distance);
             geometry.segment_offsets.push_back(geometry.locations.size());
+            geometry.segment_details.push_back({
+                pre_osm_node_id,
+                cur_osm_node_id,
+                cumulative_distance,
+                path_point.duration_until_turn / 10.
+            });
             cumulative_distance = 0.;
+            pre_osm_node_id = cur_osm_node_id;
         }
 
         prev_coordinate = coordinate;
         geometry.annotations.emplace_back(LegGeometry::Annotation{
             current_distance, path_point.duration_until_turn / 10., path_point.datasource_id});
         geometry.locations.push_back(std::move(coordinate));
-        geometry.osm_node_ids.push_back(facade.GetOSMNodeIDOfNode(path_point.turn_via_node));
+        geometry.osm_node_ids.push_back(cur_osm_node_id);
     }
     current_distance =
         util::coordinate_calculation::haversineDistance(prev_coordinate, target_node.location);
@@ -119,20 +128,26 @@ inline LegGeometry assembleGeometry(const datafacade::BaseDataFacade &facade,
         target_node.fwd_segment_position + (reversed_target ? 0 : 1);
     // we don't save the first node id in the forward geometry, we need to get it as last coordinate from the reverse
     // geometry
+    OSMNodeID cur_osm_node_id;
     if (target_segment_end_coordinate == 0)
     {
         std::vector<NodeID> target_geometry;
         facade.GetUncompressedGeometry(target_node.reverse_packed_geometry_id, target_geometry);
-        geometry.osm_node_ids.push_back(
-            facade.GetOSMNodeIDOfNode(target_geometry.back()));
+        cur_osm_node_id = facade.GetOSMNodeIDOfNode(target_geometry.back());
     }
     else
     {
         std::vector<NodeID> target_geometry;
         facade.GetUncompressedGeometry(target_node.forward_packed_geometry_id, target_geometry);
-        geometry.osm_node_ids.push_back(
-            facade.GetOSMNodeIDOfNode(target_geometry[target_segment_end_coordinate - 1]));
+        cur_osm_node_id = facade.GetOSMNodeIDOfNode(target_geometry[target_segment_end_coordinate - 1]);
     }
+    geometry.osm_node_ids.push_back(cur_osm_node_id);
+    geometry.segment_details.push_back({
+        pre_osm_node_id,
+        cur_osm_node_id,
+        cumulative_distance,
+        target_node.forward_weight / 10.
+    });
 
     BOOST_ASSERT(geometry.segment_distances.size() == geometry.segment_offsets.size() - 1);
     BOOST_ASSERT(geometry.locations.size() > geometry.segment_distances.size());

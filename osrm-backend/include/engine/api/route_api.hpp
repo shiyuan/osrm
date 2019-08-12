@@ -212,12 +212,14 @@ class RouteAPI : public BaseAPI
                 util::json::Array distances;
                 util::json::Array nodes;
                 util::json::Array datasources;
+                util::json::Array segment_details;
                 auto &leg_geometry = leg_geometries[idx];
 
                 durations.values.reserve(leg_geometry.annotations.size());
                 distances.values.reserve(leg_geometry.annotations.size());
                 nodes.values.reserve(leg_geometry.osm_node_ids.size());
                 datasources.values.reserve(leg_geometry.annotations.size());
+                segment_details.values.reserve(leg_geometry.segment_details.size());
 
                 std::for_each(leg_geometry.annotations.begin(),
                               leg_geometry.annotations.end(),
@@ -232,11 +234,22 @@ class RouteAPI : public BaseAPI
                               [this, &nodes](const OSMNodeID &node_id) {
                                   nodes.values.push_back(static_cast<std::uint64_t>(node_id));
                               });
+                std::for_each(leg_geometry.segment_details.begin(),
+                             leg_geometry.segment_details.end(),
+                             [this, &segment_details](const guidance::LegGeometry::SegmentDetail &detail){
+                                 util::json::Object js;
+                                 js.values["source"] = detail.source.__value;
+                                 js.values["target"] = detail.target.__value;
+                                 js.values["distance"] = detail.distance;
+                                 js.values["duration"] = detail.duration;
+                                 segment_details.values.push_back(js);
+                             });
                 util::json::Object annotation;
                 annotation.values["distance"] = std::move(distances);
                 annotation.values["duration"] = std::move(durations);
                 annotation.values["nodes"] = std::move(nodes);
                 annotation.values["datasources"] = std::move(datasources);
+                annotation.values["segments"] = std::move(segment_details);
                 annotations.push_back(std::move(annotation));
             }
         }

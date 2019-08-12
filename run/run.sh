@@ -16,7 +16,7 @@ wget http://download.openstreetmap.fr/extracts/asia/china/${CITY}.osm.pbf
 docker run -i -v ${PWD}:/data ${IMAGE} sh -c "echo 'disk=/tmp/stxxl,${STXXL_MEM},syscall unlink' > .stxxl && osrm-extract /data/${CITY}.osm.pbf -p profiles/${MODE}.lua"
 
 # contract
-docker run -i -v ${PWD}:/data ${IMAGE} osrm-contract /data/${CITY}.osrm
+docker run -i -v ${PWD}:/data ${IMAGE} sh -c "echo 'disk=/tmp/stxxl,${STXXL_MEM},syscall unlink' > .stxxl && osrm-contract /data/${CITY}.osrm"
 
 # routed server
 docker run -i -p 5000:5000 -v ${PWD}:/data ${IMAGE} osrm-routed /data/${CITY}.osrm

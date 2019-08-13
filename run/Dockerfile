@@ -53,15 +53,15 @@ RUN wget -O stxxl-1.4.0.tar.gz https://github.com/stxxl/stxxl/archive/1.4.0.tar.
   cd ../.. && rm -rf stxxl-*
 
 # thrift 0.10.0
-#RUN export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ && \
-#  yum install -y libtool flex bison && \
-#  wget -O thrift-0.10.0.tar.gz https://github.com/apache/thrift/archive/0.10.0.tar.gz && \
-#  tar vxf thrift-0.10.0.tar.gz && \
-#  cd thrift-0.10.0 && \
-#  ./bootstrap.sh && \
-#  ./configure --without-qt4 --without-qt5 --without-java --without-nodejs --without-lua --without-csharp --without-erlang --without-perl --without-php --without-php_extension --without-haskell --without-dart --without-ruby --without-haskell --without-go --without-haxe --without-d && \
-#  make && make install && \
-#  rm -rf thrift-*
+RUN export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ && \
+  yum install -y libtool flex bison openssl-devel && \
+  wget -O thrift-0.10.0.tar.gz https://github.com/apache/thrift/archive/0.10.0.tar.gz && \
+  tar vxf thrift-0.10.0.tar.gz && \
+  cd thrift-0.10.0 && \
+  ./bootstrap.sh && \
+  ./configure --without-qt4 --without-qt5 --without-java --without-nodejs --without-lua --without-csharp --without-erlang --without-perl --without-php --without-php_extension --without-haskell --without-dart --without-ruby --without-haskell --without-go --without-haxe --without-d && \
+  make && make install && \
+  cd .. && rm -rf thrift-*
 
 # devel
 RUN yum install -y libzip-devel expat-devel \

@@ -60,6 +60,7 @@ option(ENABLE_GOLD_LINKER "Use GNU gold linker if available" ON)
 include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR}/include/)
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/third_party/)
+include_directories(SYSTEM src/gen-cpp/)
 
 add_custom_target(FingerPrintConfigure ALL ${CMAKE_COMMAND}
   "-DOUTPUT_DIR=${CMAKE_CURRENT_BINARY_DIR}"
@@ -80,6 +81,7 @@ file(GLOB ContractorGlob src/contractor/*.cpp)
 file(GLOB StorageGlob src/storage/*.cpp)
 file(GLOB ServerGlob src/server/*.cpp src/server/**/*.cpp)
 file(GLOB EngineGlob src/engine/*.cpp src/engine/**/*.cpp)
+file(GLOB ThriftServerGlob src/gen-cpp/*.cpp src/thrift_server/*.cpp)
 
 add_library(UTIL OBJECT ${UtilGlob})
 add_library(EXTRACTOR OBJECT ${ExtractorGlob})
@@ -87,6 +89,7 @@ add_library(CONTRACTOR OBJECT ${ContractorGlob})
 add_library(STORAGE OBJECT ${StorageGlob})
 add_library(ENGINE OBJECT ${EngineGlob})
 add_library(SERVER OBJECT ${ServerGlob})
+add_library(THRIFT_SERVER OBJECT ${ThriftServerGlob})
 
 add_dependencies(UTIL FingerPrintConfigure)
 set_target_properties(UTIL PROPERTIES LINKER_LANGUAGE CXX)
@@ -95,6 +98,7 @@ add_executable(osrm-extract src/tools/extract.cpp)
 add_executable(osrm-contract src/tools/contract.cpp)
 add_executable(osrm-routed src/tools/routed.cpp $<TARGET_OBJECTS:SERVER> $<TARGET_OBJECTS:UTIL>)
 add_executable(osrm-datastore src/tools/store.cpp $<TARGET_OBJECTS:UTIL>)
+add_executable(osrm-server src/tools/server.cpp $<TARGET_OBJECTS:THRIFT_SERVER> $<TARGET_OBJECTS:SERVER>)
 add_library(osrm src/osrm/osrm.cpp $<TARGET_OBJECTS:ENGINE> $<TARGET_OBJECTS:UTIL> $<TARGET_OBJECTS:STORAGE>)
 add_library(osrm_extract $<TARGET_OBJECTS:EXTRACTOR> $<TARGET_OBJECTS:UTIL>)
 add_library(osrm_contract $<TARGET_OBJECTS:CONTRACTOR> $<TARGET_OBJECTS:UTIL>)
@@ -274,7 +278,6 @@ set(OSMIUM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/libosmium/includ
 find_package(Osmium REQUIRED COMPONENTS io)
 add_dependency_includes(${OSMIUM_INCLUDE_DIR})
 
-
 find_package(Boost 1.49.0 REQUIRED COMPONENTS ${BOOST_COMPONENTS})
 
 # collect a subset of the boost libraries needed
@@ -342,11 +345,17 @@ endif()
 add_definitions(${OSRM_DEFINES})
 include_directories(SYSTEM ${OSRM_INCLUDE_PATHS})
 
+find_package(THRIFT REQUIRED)
+add_dependency_includes(${THRIFT_INCLUDE_DIR})
+message(STATUS "thrift lib:" ${THRIFT_LIBRARY})
+message(STATUS "thrift include: " ${THRIFT_INCLUDE_DIR})
+
 # Binaries
-target_link_libraries(osrm-datastore osrm_store ${Boost_LIBRARIES})
-target_link_libraries(osrm-extract osrm_extract ${Boost_LIBRARIES})
-target_link_libraries(osrm-contract ${Boost_LIBRARIES} ${TBB_LIBRARIES} osrm_contract)
+target_link_libraries(osrm-datastore osrm_store)
+target_link_libraries(osrm-extract osrm_extract)
+target_link_libraries(osrm-contract osrm_contract)
 target_link_libraries(osrm-routed osrm ${Boost_LIBRARIES} ${OPTIONAL_SOCKET_LIBS} ${ZLIB_LIBRARY})
+target_link_libraries(osrm-server osrm ${Boost_LIBRARIES} ${THRIFT_LIBRARY})
 
 set(EXTRACTOR_LIBRARIES
     ${BZIP2_LIBRARIES}
@@ -457,6 +466,7 @@ install(TARGETS osrm-extract DESTINATION bin)
 install(TARGETS osrm-contract DESTINATION bin)
 install(TARGETS osrm-datastore DESTINATION bin)
 install(TARGETS osrm-routed DESTINATION bin)
+install(TARGETS osrm-server DESTINATION bin)
 install(TARGETS osrm DESTINATION lib)
 install(TARGETS osrm_extract DESTINATION lib)
 install(TARGETS osrm_contract DESTINATION lib)
@@ -536,3 +546,4 @@ if (ENABLE_FUZZING)
 
   add_subdirectory(fuzz)
 endif ()
+

@@ -30,6 +30,9 @@ class ServiceHandler
     using ResultT = service::BaseService::ResultT;
 
     engine::Status RunQuery(api::ParsedURL parsed_url, ResultT &result);
+    OSRM& getRouteMachine() {
+        return routing_machine;
+    }
 
   private:
     std::unordered_map<std::string, std::unique_ptr<service::BaseService>> service_map;

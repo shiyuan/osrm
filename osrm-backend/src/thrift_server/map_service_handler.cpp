@@ -65,7 +65,7 @@ void parseP2PRouteJsonResult(PointToPointResponse &_return,
 
         const auto json_details = first_route.values.at("legs").get<osrm::json::Array>().values.front()
                 .get<osrm::util::json::Object>().values.at("annotation").get<osrm::json::Object>().values.at(
-                        "segment_details")
+                        "segments")
                 .get<osrm::util::json::Array>().values;
         steps.reserve(json_details.size());
         for (auto iter = json_details.begin(); iter != json_details.end(); ++iter) {
@@ -77,14 +77,12 @@ void parseP2PRouteJsonResult(PointToPointResponse &_return,
                     "target").get<osrm::json::Number>().value);
             auto &seg_distance = json_detail.values.at("distance").get<osrm::json::Number>().value;
             auto &seg_duration = json_detail.values.at("duration").get<osrm::json::Number>().value;
-            auto &seg_mode = json_detail.values.at("mode").get<osrm::json::String>().value;
 
             auto step = map_service::Step();
             step.__set_source_node(source_node);
             step.__set_target_node(target_node);
             step.__set_distance(seg_distance);
             step.__set_duration(seg_duration);
-            step.__set_mode(seg_mode);
             steps.push_back(step);
         }
         _return.__set_steps(steps);

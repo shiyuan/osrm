@@ -89,7 +89,7 @@ class Step : public virtual ::apache::thrift::TBase {
 
   Step(const Step&);
   Step& operator=(const Step&);
-  Step() : source_node(0), target_node(0), distance(0), duration(0), mode() {
+  Step() : source_node(0), target_node(0), distance(0), duration(0) {
   }
 
   virtual ~Step() throw();
@@ -97,7 +97,6 @@ class Step : public virtual ::apache::thrift::TBase {
   int64_t target_node;
   double distance;
   double duration;
-  std::string mode;
 
   void __set_source_node(const int64_t val);
 
@@ -106,8 +105,6 @@ class Step : public virtual ::apache::thrift::TBase {
   void __set_distance(const double val);
 
   void __set_duration(const double val);
-
-  void __set_mode(const std::string& val);
 
   bool operator == (const Step & rhs) const
   {
@@ -118,8 +115,6 @@ class Step : public virtual ::apache::thrift::TBase {
     if (!(distance == rhs.distance))
       return false;
     if (!(duration == rhs.duration))
-      return false;
-    if (!(mode == rhs.mode))
       return false;
     return true;
   }

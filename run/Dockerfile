@@ -80,6 +80,8 @@ RUN export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ && \
   cp -r osrm-backend/profiles /opt && \
   rm -rf osrm-backend
 
+RUN echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/lib" >> ~/.bashrc
+
 FROM builder AS runstage
 COPY --from=builder /usr/local /usr/local
 WORKDIR /opt

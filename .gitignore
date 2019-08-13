@@ -34,3 +34,6 @@
 # osrm data
 run/*.osrm*
 *.osm.pbf
+
+# py
+*.pyc

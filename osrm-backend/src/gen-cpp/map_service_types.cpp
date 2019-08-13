@@ -155,10 +155,6 @@ void Step::__set_duration(const double val) {
   this->duration = val;
 }
 
-void Step::__set_mode(const std::string& val) {
-  this->mode = val;
-}
-
 uint32_t Step::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
@@ -175,7 +171,6 @@ uint32_t Step::read(::apache::thrift::protocol::TProtocol* iprot) {
   bool isset_target_node = false;
   bool isset_distance = false;
   bool isset_duration = false;
-  bool isset_mode = false;
 
   while (true)
   {
@@ -217,14 +212,6 @@ uint32_t Step::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
-      case 5:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->mode);
-          isset_mode = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -241,8 +228,6 @@ uint32_t Step::read(::apache::thrift::protocol::TProtocol* iprot) {
   if (!isset_distance)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_duration)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_mode)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
 }
@@ -268,10 +253,6 @@ uint32_t Step::write(::apache::thrift::protocol::TProtocol* oprot) const {
   xfer += oprot->writeDouble(this->duration);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("mode", ::apache::thrift::protocol::T_STRING, 5);
-  xfer += oprot->writeString(this->mode);
-  xfer += oprot->writeFieldEnd();
-
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -283,7 +264,6 @@ void swap(Step &a, Step &b) {
   swap(a.target_node, b.target_node);
   swap(a.distance, b.distance);
   swap(a.duration, b.duration);
-  swap(a.mode, b.mode);
 }
 
 Step::Step(const Step& other2) {
@@ -291,14 +271,12 @@ Step::Step(const Step& other2) {
   target_node = other2.target_node;
   distance = other2.distance;
   duration = other2.duration;
-  mode = other2.mode;
 }
 Step& Step::operator=(const Step& other3) {
   source_node = other3.source_node;
   target_node = other3.target_node;
   distance = other3.distance;
   duration = other3.duration;
-  mode = other3.mode;
   return *this;
 }
 void Step::printTo(std::ostream& out) const {
@@ -308,7 +286,6 @@ void Step::printTo(std::ostream& out) const {
   out << ", " << "target_node=" << to_string(target_node);
   out << ", " << "distance=" << to_string(distance);
   out << ", " << "duration=" << to_string(duration);
-  out << ", " << "mode=" << to_string(mode);
   out << ")";
 }
 

@@ -77,6 +77,7 @@ inline LegGeometry assembleGeometry(const datafacade::BaseDataFacade &facade,
     for (const auto &path_point : leg_data)
     {
         auto coordinate = facade.GetCoordinateOfNode(path_point.turn_via_node);
+        // TODO replace with osm link length
         current_distance =
             util::coordinate_calculation::haversineDistance(prev_coordinate, coordinate);
         cumulative_distance += current_distance;
@@ -90,7 +91,7 @@ inline LegGeometry assembleGeometry(const datafacade::BaseDataFacade &facade,
             geometry.segment_details.push_back({
                 pre_osm_node_id,
                 cur_osm_node_id,
-                cumulative_distance,
+                std::round(cumulative_distance),
                 path_point.duration_until_turn / 10.
             });
             cumulative_distance = 0.;
@@ -145,7 +146,7 @@ inline LegGeometry assembleGeometry(const datafacade::BaseDataFacade &facade,
     geometry.segment_details.push_back({
         pre_osm_node_id,
         cur_osm_node_id,
-        cumulative_distance,
+        std::round(cumulative_distance),
         target_node.forward_weight / 10.
     });
 

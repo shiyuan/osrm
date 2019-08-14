@@ -1,4 +1,4 @@
-# osrm
+# OSRM
 A routing demo running on docker, based on [osrm](https://github.com/Project-OSRM/osrm-backend)
 
 ## change

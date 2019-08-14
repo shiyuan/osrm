@@ -37,3 +37,10 @@ run/*.osrm*
 
 # py
 *.pyc
+
+# log
+run/wget-log
+
+# idea
+.idea
+cmake-build-debug

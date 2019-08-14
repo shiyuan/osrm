@@ -1,4 +1,4 @@
-from utils.coordinate_converter import coordinate_converter
+from utils.coordinate_converter import convert_wgs84_to_gcj02
 from imposm.parser import OSMParser
 from collections import namedtuple
 Node = namedtuple('Node', ['id', 'lat', 'lng'])
@@ -21,8 +21,9 @@ class NodeParser(object):
 way_parser = WayParser()
 node_parser = NodeParser()
 
-import os
-parser = OSMParser(concurrency=os.cpu_count(), 
+import multiprocessing
+cpu_count = multiprocessing.cpu_count()
+parser = OSMParser(concurrency=cpu_count, 
     ways_callback=way_parser.parse, 
     coords_callback=node_parser.parse)
 

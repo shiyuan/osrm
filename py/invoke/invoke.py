@@ -12,13 +12,13 @@ from map_service import MapService
 from map_service.ttypes import *
 
 class Invoker(object):
-    def __init__(self, url='localhost', port=5000):
-        self.url = url
+    def __init__(self, ip='localhost', port=5000):
+        self.ip = ip
         self.port = port
 
     @contextmanager
     def thrift_client(self):
-        socket = TSocket.TSocket(self.url, self.port)
+        socket = TSocket.TSocket(self.ip, self.port)
         transport = TTransport.TBufferedTransport(socket)
         protocol = TBinaryProtocol.TBinaryProtocolAccelerated(transport)
         client = MapService.Client(protocol)
@@ -26,7 +26,7 @@ class Invoker(object):
         yield client
         transport.close()
 
-    def p2p_route(self, src_lat, src_lng, dst_lat, dst_lng, step=False):
+    def p2p_route(self, src_lat, src_lng, dst_lat, dst_lng, step):
         src = Point(src_lat, src_lng)
         dst = Point(dst_lat, dst_lng)
         req = PointToPointRequest(src, dst, step_flag=step)
@@ -34,6 +34,9 @@ class Invoker(object):
         with self.thrift_client() as client:
             res = client.pointToPointRoute(req)
         return res
+
+    def p2p(self, src, dst, step=False):
+        return self.p2p_route(src.lat, src.lng, dst.lat, dst.lng, step)
     
     def batch_p2p_route(self, reqs):
         p2p_reqs = []

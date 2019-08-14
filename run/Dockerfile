@@ -22,11 +22,14 @@ RUN yum install -y texinfo bzip2 file && \
   rm -rf /usr/lib64/libstdc++.so.6* && \
   ln -s /usr/local/lib64/libstdc++.so.6.0.21 /usr/lib64/libstdc++.so.6
 
+ENV CC /usr/local/bin/gcc
+ENV CXX /usr/local/bin/g++
+ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/usr/local/lib:/usr/lib
+
 # boost 1.63
 RUN yum install -y python-devel zlib-devel && \
   wget https://dl.bintray.com/boostorg/release/1.63.0/source/boost_1_63_0.tar.bz2 && \
   tar jvxf boost_1_63_0.tar.bz2 && cd boost_1_63_0 && \
-  export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ && \
   ./bootstrap.sh && \
   ./b2 cxxflags="--std=c++11" --includedir=/usr/include --libdir=/usr/lib64 release install && \
   cd .. && rm -rf boost_*
@@ -37,7 +40,6 @@ RUN yum install -y lua-devel && \
   cd luabind && \
   git checkout a0edf58e14cfb8cd4f13779707921b5e9caf686c && \
   mkdir build && cd build && \
-  export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ && \
   cmake .. && \
   make && make install && \
   cd ../.. && rm -rf luabind
@@ -47,19 +49,20 @@ RUN wget -O stxxl-1.4.0.tar.gz https://github.com/stxxl/stxxl/archive/1.4.0.tar.
   tar vxf stxxl-1.4.0.tar.gz && \
   cd stxxl-1.4.0 && \
   mkdir build && cd build && \
-  export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ && \
   cmake -DCMAKE_BUILD_TYPE=Release ..  && \
   make && make install && \
   cd ../.. && rm -rf stxxl-*
 
 # thrift 0.10.0
-RUN export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ && \
-  yum install -y libtool flex bison openssl-devel && \
+RUN yum install -y libtool flex bison openssl-devel && \
   wget -O thrift-0.10.0.tar.gz https://github.com/apache/thrift/archive/0.10.0.tar.gz && \
   tar vxf thrift-0.10.0.tar.gz && \
   cd thrift-0.10.0 && \
   ./bootstrap.sh && \
-  ./configure --without-qt4 --without-qt5 --without-java --without-nodejs --without-lua --without-csharp --without-erlang --without-perl --without-php --without-php_extension --without-haskell --without-dart --without-ruby --without-haskell --without-go --without-haxe --without-d && \
+  ./configure --without-qt4 --without-qt5 --without-java --without-nodejs --without-lua \
+              --without-csharp --without-erlang --without-perl --without-php \
+              --without-php_extension --without-haskell --without-dart --without-ruby \
+              --without-haskell --without-go --without-haxe --without-d && \
   make && make install && \
   cd .. && rm -rf thrift-*
 
@@ -68,8 +71,7 @@ RUN yum install -y libzip-devel expat-devel \
   tbb-devel bzip2-devel
 
 COPY osrm-backend /src/osrm-backend
-RUN export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ && \
-  cd osrm-backend && \
+RUN cd osrm-backend && \
   mkdir -p build && \
   cd build && \
   cmake .. -DCMAKE_BUILD_TYPE=Release && \
@@ -79,8 +81,6 @@ RUN export CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ && \
   cd ../../ && \
   cp -r osrm-backend/profiles /opt && \
   rm -rf osrm-backend
-
-RUN echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/lib" >> ~/.bashrc
 
 FROM builder AS runstage
 COPY --from=builder /usr/local /usr/local

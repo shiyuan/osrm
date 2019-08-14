@@ -15,5 +15,3 @@ RUN pip install imposm.parser \
   flask \
   folium \
   thrift_json
-
-COPY py /opt/py

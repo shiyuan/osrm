@@ -29,7 +29,7 @@ class Invoker(object):
     def p2p_route(self, src_lat, src_lng, dst_lat, dst_lng, step):
         src = Point(src_lat, src_lng)
         dst = Point(dst_lat, dst_lng)
-        req = PointToPointRequest(src, dst, step_flag=step)
+        req = PointToPointRequest(src, dst, step)
         res = None
         with self.thrift_client() as client:
             res = client.pointToPointRoute(req)
@@ -43,7 +43,7 @@ class Invoker(object):
         for src_lat, src_lng, dst_lat, dst_lng, step in reqs:
            src = Point(src_lat, src_lng)
            dst = Point(dst_lat, dst_lng)
-           req = PointToPointRequest(src, dst, step_flag=step)
+           req = PointToPointRequest(src, dst, step)
            p2p_reqs.append(req)
         res = []
         with self.thrift_client() as client:

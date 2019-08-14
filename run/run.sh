@@ -1,8 +1,9 @@
 #!/bin/bash
-IMAGE='osrm_demo'
-CITY='shanghai'
-STXXL_MEM='2G'
-MODE='car' # car or bicycle or foot
+IMAGE=osrm_demo
+CITY=shanghai
+STXXL_MEM=2G
+MODE=car # car or bicycle or foot
+DATA_FILE=${CITY}.osm.pbf
 
 # build docker
 cd .. && cp run/Dockerfile . && \
@@ -10,10 +11,16 @@ cd .. && cp run/Dockerfile . && \
   rm -rf Dockerfile && cd run
 
 # download data
-wget http://download.openstreetmap.fr/extracts/asia/china/${CITY}.osm.pbf
+if [ -f ${DATA_FILE} ]; then
+  echo ${DATA_FILE} already exists
+else  
+  echo try downloading ...
+  wget http://download.openstreetmap.fr/extracts/asia/china/${CITY}.osm.pbf -O ${DATA_FILE}
+  echo download finished ...
+fi
 
 # extract
-docker run -i -v ${PWD}:/data ${IMAGE} sh -c "echo 'disk=/tmp/stxxl,${STXXL_MEM},syscall unlink' > .stxxl && osrm-extract /data/${CITY}.osm.pbf -p profiles/${MODE}.lua"
+docker run -i -v ${PWD}:/data ${IMAGE} sh -c "echo 'disk=/tmp/stxxl,${STXXL_MEM},syscall unlink' > .stxxl && osrm-extract /data/${DATA_FILE} -p profiles/${MODE}.lua"
 
 # contract
 docker run -i -v ${PWD}:/data ${IMAGE} sh -c "echo 'disk=/tmp/stxxl,${STXXL_MEM},syscall unlink' > .stxxl && osrm-contract /data/${CITY}.osrm"

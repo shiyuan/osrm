@@ -20,7 +20,7 @@
 
 namespace map_service {
 
-struct ret_code {
+struct RetCode {
   enum type {
     fail = -1,
     success = 0,
@@ -28,7 +28,7 @@ struct ret_code {
   };
 };
 
-extern const std::map<int, const char*> _ret_code_VALUES_TO_NAMES;
+extern const std::map<int, const char*> _RetCode_VALUES_TO_NAMES;
 
 class Point;
 
@@ -89,18 +89,18 @@ class Step : public virtual ::apache::thrift::TBase {
 
   Step(const Step&);
   Step& operator=(const Step&);
-  Step() : source_node(0), target_node(0), distance(0), duration(0) {
+  Step() : source(0), target(0), distance(0), duration(0) {
   }
 
   virtual ~Step() throw();
-  int64_t source_node;
-  int64_t target_node;
+  int64_t source;
+  int64_t target;
   double distance;
   double duration;
 
-  void __set_source_node(const int64_t val);
+  void __set_source(const int64_t val);
 
-  void __set_target_node(const int64_t val);
+  void __set_target(const int64_t val);
 
   void __set_distance(const double val);
 
@@ -108,9 +108,9 @@ class Step : public virtual ::apache::thrift::TBase {
 
   bool operator == (const Step & rhs) const
   {
-    if (!(source_node == rhs.source_node))
+    if (!(source == rhs.source))
       return false;
-    if (!(target_node == rhs.target_node))
+    if (!(target == rhs.target))
       return false;
     if (!(distance == rhs.distance))
       return false;
@@ -139,8 +139,8 @@ inline std::ostream& operator<<(std::ostream& out, const Step& obj)
 }
 
 typedef struct _PointToPointRequest__isset {
-  _PointToPointRequest__isset() : step_flag(true) {}
-  bool step_flag :1;
+  _PointToPointRequest__isset() : step(true) {}
+  bool step :1;
 } _PointToPointRequest__isset;
 
 class PointToPointRequest : public virtual ::apache::thrift::TBase {
@@ -148,13 +148,13 @@ class PointToPointRequest : public virtual ::apache::thrift::TBase {
 
   PointToPointRequest(const PointToPointRequest&);
   PointToPointRequest& operator=(const PointToPointRequest&);
-  PointToPointRequest() : step_flag(false) {
+  PointToPointRequest() : step(false) {
   }
 
   virtual ~PointToPointRequest() throw();
   Point source;
   Point target;
-  bool step_flag;
+  bool step;
 
   _PointToPointRequest__isset __isset;
 
@@ -162,7 +162,7 @@ class PointToPointRequest : public virtual ::apache::thrift::TBase {
 
   void __set_target(const Point& val);
 
-  void __set_step_flag(const bool val);
+  void __set_step(const bool val);
 
   bool operator == (const PointToPointRequest & rhs) const
   {
@@ -170,9 +170,9 @@ class PointToPointRequest : public virtual ::apache::thrift::TBase {
       return false;
     if (!(target == rhs.target))
       return false;
-    if (__isset.step_flag != rhs.__isset.step_flag)
+    if (__isset.step != rhs.__isset.step)
       return false;
-    else if (__isset.step_flag && !(step_flag == rhs.step_flag))
+    else if (__isset.step && !(step == rhs.step))
       return false;
     return true;
   }
@@ -207,13 +207,13 @@ class PointToPointResponse : public virtual ::apache::thrift::TBase {
 
   PointToPointResponse(const PointToPointResponse&);
   PointToPointResponse& operator=(const PointToPointResponse&);
-  PointToPointResponse() : code((ret_code::type)-1), distance(-1), duration(-1) {
-    code = (ret_code::type)-1;
+  PointToPointResponse() : code((RetCode::type)-1), distance(-1), duration(-1) {
+    code = (RetCode::type)-1;
 
   }
 
   virtual ~PointToPointResponse() throw();
-  ret_code::type code;
+  RetCode::type code;
   double distance;
   double duration;
   std::vector<Step>  steps;
@@ -221,7 +221,7 @@ class PointToPointResponse : public virtual ::apache::thrift::TBase {
 
   _PointToPointResponse__isset __isset;
 
-  void __set_code(const ret_code::type val);
+  void __set_code(const RetCode::type val);
 
   void __set_distance(const double val);
 

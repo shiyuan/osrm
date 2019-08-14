@@ -3,6 +3,7 @@ map_tileset = ('https://webrd01.is.autonavi.com/appmaptile?'
                'lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}')
 
 load_node_location = lambda x: (x.lat, x.lng)
+get_avg_location = lambda x, y: ((x.lat + y.lat)/2., (x.lng + y.lng)/2.)
 
 import uuid
 gen_uuid = lambda: uuid.uuid4().hex
@@ -47,7 +48,7 @@ def render_line(m, source, target, color='green', weight=5, extra=''):
     ).add_to(m)
 
 def render_node_icon(m, node, color, extra):
-    detail = '{}, id: {:.6},{:.5}'.format(extra, node.lat, node.lng)
+    detail = '{}, loc: {:.6},{:.5}'.format(extra, node.lat, node.lng)
     folium.Marker(
         [node.lat, node.lng],
         popup = detail,
@@ -64,11 +65,10 @@ def render_node_connection(m, source, target, color):
 
 def render_map(all_nodes, route):
     content = 'distance: {:.2f}, duration: {:.2f}'.format(route.distance, route.duration)
-    median_step = route.steps[(len(route.steps) - 1)/2]
-    median_node = all_nodes[median_step.source_node]
+    avg_location = get_avg_location(*[all_nodes[step.target] for step in [route.steps[0], route.steps[-1]]])
     return folium.Map(
-        location = load_node_location(median_node),
-        zoom_start = 15,
+        location = avg_location,
+        zoom_start = 12,
         attr = content,
         tiles = map_tileset
     )
@@ -78,8 +78,8 @@ def gen_map(all_nodes, route, source, target):
     nodes = []
     for step in route.steps:
         content = 'distance: {}, duration: {}'.format(step.distance, step.duration)
-        step_source = all_nodes[step.source_node]
-        step_target = all_nodes[step.target_node]
+        step_source = all_nodes[step.source]
+        step_target = all_nodes[step.target]
         render_line(m_, step_source, step_target, 'green', 5, content)
         if len(nodes) == 0:
             nodes.append(step_source)

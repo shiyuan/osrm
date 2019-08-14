@@ -13,17 +13,17 @@
 
 namespace map_service {
 
-int _kret_codeValues[] = {
-  ret_code::fail,
-  ret_code::success,
-  ret_code::degrade
+int _kRetCodeValues[] = {
+  RetCode::fail,
+  RetCode::success,
+  RetCode::degrade
 };
-const char* _kret_codeNames[] = {
+const char* _kRetCodeNames[] = {
   "fail",
   "success",
   "degrade"
 };
-const std::map<int, const char*> _ret_code_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(3, _kret_codeValues, _kret_codeNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
+const std::map<int, const char*> _RetCode_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(3, _kRetCodeValues, _kRetCodeNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
 
 
 Point::~Point() throw() {
@@ -139,12 +139,12 @@ Step::~Step() throw() {
 }
 
 
-void Step::__set_source_node(const int64_t val) {
-  this->source_node = val;
+void Step::__set_source(const int64_t val) {
+  this->source = val;
 }
 
-void Step::__set_target_node(const int64_t val) {
-  this->target_node = val;
+void Step::__set_target(const int64_t val) {
+  this->target = val;
 }
 
 void Step::__set_distance(const double val) {
@@ -167,8 +167,8 @@ uint32_t Step::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   using ::apache::thrift::protocol::TProtocolException;
 
-  bool isset_source_node = false;
-  bool isset_target_node = false;
+  bool isset_source = false;
+  bool isset_target = false;
   bool isset_distance = false;
   bool isset_duration = false;
 
@@ -182,16 +182,16 @@ uint32_t Step::read(::apache::thrift::protocol::TProtocol* iprot) {
     {
       case 1:
         if (ftype == ::apache::thrift::protocol::T_I64) {
-          xfer += iprot->readI64(this->source_node);
-          isset_source_node = true;
+          xfer += iprot->readI64(this->source);
+          isset_source = true;
         } else {
           xfer += iprot->skip(ftype);
         }
         break;
       case 2:
         if (ftype == ::apache::thrift::protocol::T_I64) {
-          xfer += iprot->readI64(this->target_node);
-          isset_target_node = true;
+          xfer += iprot->readI64(this->target);
+          isset_target = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -221,9 +221,9 @@ uint32_t Step::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   xfer += iprot->readStructEnd();
 
-  if (!isset_source_node)
+  if (!isset_source)
     throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_target_node)
+  if (!isset_target)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_distance)
     throw TProtocolException(TProtocolException::INVALID_DATA);
@@ -237,12 +237,12 @@ uint32_t Step::write(::apache::thrift::protocol::TProtocol* oprot) const {
   apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("Step");
 
-  xfer += oprot->writeFieldBegin("source_node", ::apache::thrift::protocol::T_I64, 1);
-  xfer += oprot->writeI64(this->source_node);
+  xfer += oprot->writeFieldBegin("source", ::apache::thrift::protocol::T_I64, 1);
+  xfer += oprot->writeI64(this->source);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("target_node", ::apache::thrift::protocol::T_I64, 2);
-  xfer += oprot->writeI64(this->target_node);
+  xfer += oprot->writeFieldBegin("target", ::apache::thrift::protocol::T_I64, 2);
+  xfer += oprot->writeI64(this->target);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldBegin("distance", ::apache::thrift::protocol::T_DOUBLE, 3);
@@ -260,21 +260,21 @@ uint32_t Step::write(::apache::thrift::protocol::TProtocol* oprot) const {
 
 void swap(Step &a, Step &b) {
   using ::std::swap;
-  swap(a.source_node, b.source_node);
-  swap(a.target_node, b.target_node);
+  swap(a.source, b.source);
+  swap(a.target, b.target);
   swap(a.distance, b.distance);
   swap(a.duration, b.duration);
 }
 
 Step::Step(const Step& other2) {
-  source_node = other2.source_node;
-  target_node = other2.target_node;
+  source = other2.source;
+  target = other2.target;
   distance = other2.distance;
   duration = other2.duration;
 }
 Step& Step::operator=(const Step& other3) {
-  source_node = other3.source_node;
-  target_node = other3.target_node;
+  source = other3.source;
+  target = other3.target;
   distance = other3.distance;
   duration = other3.duration;
   return *this;
@@ -282,8 +282,8 @@ Step& Step::operator=(const Step& other3) {
 void Step::printTo(std::ostream& out) const {
   using ::apache::thrift::to_string;
   out << "Step(";
-  out << "source_node=" << to_string(source_node);
-  out << ", " << "target_node=" << to_string(target_node);
+  out << "source=" << to_string(source);
+  out << ", " << "target=" << to_string(target);
   out << ", " << "distance=" << to_string(distance);
   out << ", " << "duration=" << to_string(duration);
   out << ")";
@@ -302,9 +302,9 @@ void PointToPointRequest::__set_target(const Point& val) {
   this->target = val;
 }
 
-void PointToPointRequest::__set_step_flag(const bool val) {
-  this->step_flag = val;
-__isset.step_flag = true;
+void PointToPointRequest::__set_step(const bool val) {
+  this->step = val;
+__isset.step = true;
 }
 
 uint32_t PointToPointRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
@@ -348,8 +348,8 @@ uint32_t PointToPointRequest::read(::apache::thrift::protocol::TProtocol* iprot)
         break;
       case 3:
         if (ftype == ::apache::thrift::protocol::T_BOOL) {
-          xfer += iprot->readBool(this->step_flag);
-          this->__isset.step_flag = true;
+          xfer += iprot->readBool(this->step);
+          this->__isset.step = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -383,9 +383,9 @@ uint32_t PointToPointRequest::write(::apache::thrift::protocol::TProtocol* oprot
   xfer += this->target.write(oprot);
   xfer += oprot->writeFieldEnd();
 
-  if (this->__isset.step_flag) {
-    xfer += oprot->writeFieldBegin("step_flag", ::apache::thrift::protocol::T_BOOL, 3);
-    xfer += oprot->writeBool(this->step_flag);
+  if (this->__isset.step) {
+    xfer += oprot->writeFieldBegin("step", ::apache::thrift::protocol::T_BOOL, 3);
+    xfer += oprot->writeBool(this->step);
     xfer += oprot->writeFieldEnd();
   }
   xfer += oprot->writeFieldStop();
@@ -397,20 +397,20 @@ void swap(PointToPointRequest &a, PointToPointRequest &b) {
   using ::std::swap;
   swap(a.source, b.source);
   swap(a.target, b.target);
-  swap(a.step_flag, b.step_flag);
+  swap(a.step, b.step);
   swap(a.__isset, b.__isset);
 }
 
 PointToPointRequest::PointToPointRequest(const PointToPointRequest& other4) {
   source = other4.source;
   target = other4.target;
-  step_flag = other4.step_flag;
+  step = other4.step;
   __isset = other4.__isset;
 }
 PointToPointRequest& PointToPointRequest::operator=(const PointToPointRequest& other5) {
   source = other5.source;
   target = other5.target;
-  step_flag = other5.step_flag;
+  step = other5.step;
   __isset = other5.__isset;
   return *this;
 }
@@ -419,7 +419,7 @@ void PointToPointRequest::printTo(std::ostream& out) const {
   out << "PointToPointRequest(";
   out << "source=" << to_string(source);
   out << ", " << "target=" << to_string(target);
-  out << ", " << "step_flag="; (__isset.step_flag ? (out << to_string(step_flag)) : (out << "<null>"));
+  out << ", " << "step="; (__isset.step ? (out << to_string(step)) : (out << "<null>"));
   out << ")";
 }
 
@@ -428,7 +428,7 @@ PointToPointResponse::~PointToPointResponse() throw() {
 }
 
 
-void PointToPointResponse::__set_code(const ret_code::type val) {
+void PointToPointResponse::__set_code(const RetCode::type val) {
   this->code = val;
 }
 
@@ -478,7 +478,7 @@ uint32_t PointToPointResponse::read(::apache::thrift::protocol::TProtocol* iprot
         if (ftype == ::apache::thrift::protocol::T_I32) {
           int32_t ecast6;
           xfer += iprot->readI32(ecast6);
-          this->code = (ret_code::type)ecast6;
+          this->code = (RetCode::type)ecast6;
           isset_code = true;
         } else {
           xfer += iprot->skip(ftype);

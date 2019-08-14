@@ -13,7 +13,7 @@ import sys
 from thrift.transport import TTransport
 
 
-class ret_code(object):
+class RetCode(object):
     fail = -1
     success = 0
     degrade = 1
@@ -110,23 +110,23 @@ class Point(object):
 class Step(object):
     """
     Attributes:
-     - source_node
-     - target_node
+     - source
+     - target
      - distance
      - duration
     """
 
     thrift_spec = (
         None,  # 0
-        (1, TType.I64, 'source_node', None, None, ),  # 1
-        (2, TType.I64, 'target_node', None, None, ),  # 2
+        (1, TType.I64, 'source', None, None, ),  # 1
+        (2, TType.I64, 'target', None, None, ),  # 2
         (3, TType.DOUBLE, 'distance', None, None, ),  # 3
         (4, TType.DOUBLE, 'duration', None, None, ),  # 4
     )
 
-    def __init__(self, source_node=None, target_node=None, distance=None, duration=None,):
-        self.source_node = source_node
-        self.target_node = target_node
+    def __init__(self, source=None, target=None, distance=None, duration=None,):
+        self.source = source
+        self.target = target
         self.distance = distance
         self.duration = duration
 
@@ -141,12 +141,12 @@ class Step(object):
                 break
             if fid == 1:
                 if ftype == TType.I64:
-                    self.source_node = iprot.readI64()
+                    self.source = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
                 if ftype == TType.I64:
-                    self.target_node = iprot.readI64()
+                    self.target = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             elif fid == 3:
@@ -169,13 +169,13 @@ class Step(object):
             oprot.trans.write(oprot._fast_encode(self, (self.__class__, self.thrift_spec)))
             return
         oprot.writeStructBegin('Step')
-        if self.source_node is not None:
-            oprot.writeFieldBegin('source_node', TType.I64, 1)
-            oprot.writeI64(self.source_node)
+        if self.source is not None:
+            oprot.writeFieldBegin('source', TType.I64, 1)
+            oprot.writeI64(self.source)
             oprot.writeFieldEnd()
-        if self.target_node is not None:
-            oprot.writeFieldBegin('target_node', TType.I64, 2)
-            oprot.writeI64(self.target_node)
+        if self.target is not None:
+            oprot.writeFieldBegin('target', TType.I64, 2)
+            oprot.writeI64(self.target)
             oprot.writeFieldEnd()
         if self.distance is not None:
             oprot.writeFieldBegin('distance', TType.DOUBLE, 3)
@@ -189,10 +189,10 @@ class Step(object):
         oprot.writeStructEnd()
 
     def validate(self):
-        if self.source_node is None:
-            raise TProtocolException(message='Required field source_node is unset!')
-        if self.target_node is None:
-            raise TProtocolException(message='Required field target_node is unset!')
+        if self.source is None:
+            raise TProtocolException(message='Required field source is unset!')
+        if self.target is None:
+            raise TProtocolException(message='Required field target is unset!')
         if self.distance is None:
             raise TProtocolException(message='Required field distance is unset!')
         if self.duration is None:
@@ -216,20 +216,20 @@ class PointToPointRequest(object):
     Attributes:
      - source
      - target
-     - step_flag
+     - step
     """
 
     thrift_spec = (
         None,  # 0
         (1, TType.STRUCT, 'source', (Point, Point.thrift_spec), None, ),  # 1
         (2, TType.STRUCT, 'target', (Point, Point.thrift_spec), None, ),  # 2
-        (3, TType.BOOL, 'step_flag', None, False, ),  # 3
+        (3, TType.BOOL, 'step', None, False, ),  # 3
     )
 
-    def __init__(self, source=None, target=None, step_flag=thrift_spec[3][4],):
+    def __init__(self, source=None, target=None, step=thrift_spec[3][4],):
         self.source = source
         self.target = target
-        self.step_flag = step_flag
+        self.step = step
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -254,7 +254,7 @@ class PointToPointRequest(object):
                     iprot.skip(ftype)
             elif fid == 3:
                 if ftype == TType.BOOL:
-                    self.step_flag = iprot.readBool()
+                    self.step = iprot.readBool()
                 else:
                     iprot.skip(ftype)
             else:
@@ -275,9 +275,9 @@ class PointToPointRequest(object):
             oprot.writeFieldBegin('target', TType.STRUCT, 2)
             self.target.write(oprot)
             oprot.writeFieldEnd()
-        if self.step_flag is not None:
-            oprot.writeFieldBegin('step_flag', TType.BOOL, 3)
-            oprot.writeBool(self.step_flag)
+        if self.step is not None:
+            oprot.writeFieldBegin('step', TType.BOOL, 3)
+            oprot.writeBool(self.step)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()

@@ -16,4 +16,5 @@ print(s.getsockname()[0])
 s.close()"`
 
 # run flask server
-docker run -d -p ${PORT}:${PORT} -t ${IMAGE} sh -c "cd py && python flask_server.py -ti ${THRIFT_SERVER_IP} -tp 5000 -p ${PORT} -c ${CITY}"
+docker run -d -v ${PWD}/../py:/opt/py -p ${PORT}:${PORT} -t ${IMAGE} \
+   sh -c "cd py && python flask_server.py -ti ${THRIFT_SERVER_IP} -tp 5000 -p ${PORT} -c ${CITY}"

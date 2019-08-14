@@ -1,6 +1,6 @@
 namespace cpp map_service
 
-enum ret_code {
+enum RetCode {
   fail = -1;
   success = 0;
   degrade = 1;
@@ -12,8 +12,8 @@ struct Point {
 }
 
 struct Step {
-  1: required i64 source_node;
-  2: required i64 target_node;
+  1: required i64 source;
+  2: required i64 target;
   3: required double distance;
   4: required double duration;
 }
@@ -21,11 +21,11 @@ struct Step {
 struct PointToPointRequest {
   1: required Point source;
   2: required Point target;
-  3: optional bool step_flag = false;
+  3: optional bool step = false;
 }
 
 struct PointToPointResponse {
-  1: required ret_code code = ret_code.fail;
+  1: required RetCode code = RetCode.fail;
   2: required double distance = -1;
   3: required double duration = -1;
   4: optional list<Step> steps;

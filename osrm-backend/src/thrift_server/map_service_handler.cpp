@@ -8,7 +8,7 @@
 
 using map_service::PointToPointRequest;
 using map_service::PointToPointResponse;
-using map_service::ret_code;
+using map_service::RetCode;
 
 namespace osrm
 {
@@ -36,7 +36,7 @@ void constructP2PRouteParams(RouteParameters &params,
                              const PointToPointRequest &request)
 {
     constructCoordinates(params.coordinates, request);
-    params.steps = request.step_flag;
+    params.steps = request.step;
     params.alternatives = false;
     params.annotations = params.steps;
 }
@@ -52,7 +52,7 @@ void parseP2PRouteJsonResult(PointToPointResponse &_return,
     const auto duration = first_route.values.at("duration").get<osrm::json::Number>().value;
     std::vector<map_service::Step> steps;
     std::vector<map_service::Point> projections;
-    if (request.step_flag) {
+    if (request.step) {
         auto way_points = result.values.at("waypoints").get<osrm::json::Array>().values;
         for (auto iter = way_points.begin(); iter != way_points.end(); ++iter) {
             const auto &json_point = (*iter).get<osrm::json::Object>();
@@ -71,16 +71,16 @@ void parseP2PRouteJsonResult(PointToPointResponse &_return,
         for (auto iter = json_details.begin(); iter != json_details.end(); ++iter) {
             const auto &json_detail = (*iter).get<util::json::Object>();
             // OSMNodeID convert may cause overflow, because thrift doesn't support uint64_t
-            auto source_node = static_cast<std::int64_t>(json_detail.values.at(
+            auto source = static_cast<std::int64_t>(json_detail.values.at(
                     "source").get<osrm::json::Number>().value);
-            auto target_node = static_cast<std::int64_t>(json_detail.values.at(
+            auto target = static_cast<std::int64_t>(json_detail.values.at(
                     "target").get<osrm::json::Number>().value);
             auto &seg_distance = json_detail.values.at("distance").get<osrm::json::Number>().value;
             auto &seg_duration = json_detail.values.at("duration").get<osrm::json::Number>().value;
 
             auto step = map_service::Step();
-            step.__set_source_node(source_node);
-            step.__set_target_node(target_node);
+            step.__set_source(source);
+            step.__set_target(target);
             step.__set_distance(seg_distance);
             step.__set_duration(seg_duration);
             steps.push_back(step);
@@ -88,13 +88,13 @@ void parseP2PRouteJsonResult(PointToPointResponse &_return,
         _return.__set_steps(steps);
         _return.__set_projections(projections);
     }
-    _return.__set_code(ret_code::success);
+    _return.__set_code(RetCode::success);
     _return.__set_distance(distance);
     _return.__set_duration(duration);
 }
 
 void buildPointToPointDegradeResult(PointToPointResponse &_return, const PointToPointRequest &request) {
-    _return.__set_code(ret_code::degrade);
+    _return.__set_code(RetCode::degrade);
 
     auto source = toCoordinate(request.source);
     auto target = toCoordinate(request.target);
@@ -129,7 +129,7 @@ void MapServiceHandler::pointToPointRoute(PointToPointResponse &_return, const P
     }
     else
     {
-        _return.__set_code(ret_code::fail);
+        _return.__set_code(RetCode::fail);
     }
 }
 

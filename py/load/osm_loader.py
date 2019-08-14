@@ -27,3 +27,16 @@ parser = OSMParser(concurrency=cpu_count,
     ways_callback=way_parser.parse, 
     coords_callback=node_parser.parse)
 
+import os, requests
+download_url = 'http://download.openstreetmap.fr/extracts/asia/china/{}.osm.pbf'
+def load_osm_pbf(city):
+    data_file = '{}.osm.pbf'.format(city)
+    if os.path.exists(data_file): 
+        print('{} already exist'.format(data_file))
+    else:
+        print('try downloading {}'.format(data_file))
+        r = requests.get(download_url.format(city))
+        with open(data_file, 'w') as f:
+            f.write(r.content)
+        print('download finished')
+    return data_file

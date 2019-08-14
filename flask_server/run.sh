@@ -1,6 +1,7 @@
-IMAGE='osrm_flask'
+IMAGE=osrm_flask
 DIR=`pwd`
 PORT=10000
+CITY=shanghai
 
 # build docker
 cd .. && cp flask_server/Dockerfile . && \
@@ -15,4 +16,4 @@ print(s.getsockname()[0])
 s.close()"`
 
 # run flask server
-docker run -d -p ${PORT}:${PORT} -t ${IMAGE} sh -c "cd py && python flask_server.py --thrift_ip ${THRIFT_SERVER_IP} --thrift_port 5000 --server_port ${PORT}"
+docker run -d -p ${PORT}:${PORT} -t ${IMAGE} sh -c "cd py && python flask_server.py -ti ${THRIFT_SERVER_IP} -tp 5000 -p ${PORT} -c ${CITY}"

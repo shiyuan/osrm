@@ -1,0 +1,101 @@
+import folium
+map_tileset = ('https://webrd01.is.autonavi.com/appmaptile?'
+               'lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}')
+
+load_node_location = lambda x: (x.lat, x.lng)
+
+import uuid
+gen_uuid = lambda: uuid.uuid4().hex
+
+import os
+rm_file = lambda x: os.system('rm -rf {}'.format(x))
+
+import sys
+sys.path.append(os.path.dirname(__file__) + '/..')
+from utils.distance import gcd_distance
+
+# converte folium map to html text
+def map_to_text(m):
+    temp_file = gen_uuid()
+    try:
+        m.save(temp_file)
+        with open(temp_file) as f:
+            res = f.read()
+    finally:
+        rm_file(temp_file)
+    return res
+
+def render_node(m, node, color='black', radius=3):
+    detail = 'id: {:.0f}, loc: {:.6},{:.5}'.format(node.id, node.lat, node.lng)
+    folium.Circle(
+        load_node_location(node), 
+        radius = radius,
+        fill = True,
+        color = color,
+        popup = detail
+   ).add_to(m)
+
+def render_line(m, source, target, color='green', weight=5, extra=''):
+    road_length = int(gcd_distance(source.lat, source.lng, target.lat, target.lng) + .5)
+    detail = 'from {} to {}, road_length: {:.2f}'.format(source.id, target.id, road_length) + ', {}'.format(extra)
+    folium.PolyLine(
+        [load_node_location(x) for x in [source, target]],
+        color = color,
+        weight = weight,
+        opacity = 1,
+        popup = detail
+    ).add_to(m)
+
+def render_node_icon(m, node, color, extra):
+    detail = '{}, id: {:.6},{:.5}'.format(extra, node.lat, node.lng)
+    folium.Marker(
+        [node.lat, node.lng],
+        popup = detail,
+        icon = folium.Icon(color=color)
+    ).add_to(m)
+
+def render_node_connection(m, source, target, color):
+    folium.PolyLine(
+        [load_node_location(x) for x in [source, target]],
+        opacity = 0.8,
+        color = color
+    ).add_to(m)
+
+
+def render_map(all_nodes, route):
+    content = 'distance: {:.2f}, duration: {:.2f}'.format(route.distance, route.duration)
+    median_step = route.steps[(len(route.steps) - 1)/2]
+    median_node = all_nodes[median_step.source_node]
+    return folium.Map(
+        location = load_node_location(median_node),
+        zoom_start = 15,
+        attr = content,
+        tiles = map_tileset
+    )
+
+def gen_map(all_nodes, route, source, target):
+    m_ = render_map(all_nodes, route)
+    nodes = []
+    for step in route.steps:
+        content = 'distance: {}, duration: {}'.format(step.distance, step.duration)
+        step_source = all_nodes[step.source_node]
+        step_target = all_nodes[step.target_node]
+        render_line(m_, step_source, step_target, 'green', 5, content)
+        if len(nodes) == 0:
+            nodes.append(step_source)
+        nodes.append(step_target)
+    
+    for node in nodes:
+        render_node(m_, node, 'orange')
+
+    render_node_icon(m_, source, 'blue', 'origin source')
+    render_node_icon(m_, target, 'darkred', 'origin target')
+
+    proj_source, proj_target = route.projections
+    render_node_icon(m_, proj_source, 'lightblue', 'project source')
+    render_node_icon(m_, proj_target, 'red', 'project target')   
+    render_node_connection(m_, source, proj_source, 'orange')
+    render_node_connection(m_, target, proj_target, 'orange')
+
+    return map_to_text(m_)
+

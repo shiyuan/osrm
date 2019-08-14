@@ -27,7 +27,7 @@ def map_to_text(m):
     return res
 
 def render_node(m, node, color='black', radius=3):
-    detail = 'id: {:.0f}, loc: {:.6},{:.5}'.format(node.id, node.lat, node.lng)
+    detail = 'id: {:.0f}, loc: {:.6f},{:.5f}'.format(node.id, node.lat, node.lng)
     folium.Circle(
         load_node_location(node), 
         radius = radius,
@@ -48,7 +48,7 @@ def render_line(m, source, target, color='green', weight=5, extra=''):
     ).add_to(m)
 
 def render_node_icon(m, node, color, extra):
-    detail = '{}, loc: {:.6},{:.5}'.format(extra, node.lat, node.lng)
+    detail = '{}, loc: {:.6f},{:.5f}'.format(extra, node.lat, node.lng)
     folium.Marker(
         [node.lat, node.lng],
         popup = detail,

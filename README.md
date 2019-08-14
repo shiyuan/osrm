@@ -8,3 +8,4 @@ A routing demo running on docker, based on [osrm](https://github.com/Project-OSR
 4. Convert coordinate from wgs84 to gcj02
 5. Add thrift service and handler
 6. Use folium to render map result
+7. Add routing [demo](./docs)
